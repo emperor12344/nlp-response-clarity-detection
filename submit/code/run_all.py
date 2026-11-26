@@ -41,7 +41,7 @@ def run_one(name, required):
     if not os.path.exists(path):
         print(f'[跳过] 找不到 {name}')
         return required is False
-    print(f'\n{"=" * 64}\n>>> 运行 {name}\n{"=" * 64}')
+    print(f'\n>>> 运行 {name}')
     r = subprocess.run([sys.executable, path])
     ok = r.returncode == 0
     if not ok:

@@ -34,7 +34,7 @@ y_test = test['clarity_label'].tolist()
 
 results = {}
 
-# ---------- 多数类基线 ----------
+# 多数类基线
 maj = Counter(y_train).most_common(1)[0][0]
 maj_pred = [maj] * len(y_test)
 results['多数类基线'] = {
@@ -43,7 +43,7 @@ results['多数类基线'] = {
     'note': f'全部预测为 {maj}'
 }
 
-# ---------- TF-IDF + 逻辑回归：对比 unigram vs unigram+bigram ----------
+# TF-IDF + 逻辑回归：对比 unigram vs unigram+bigram
 best = None
 for name, ng in [('TF-IDF(unigram)+LR', (1, 1)), ('TF-IDF(uni+bigram)+LR', (1, 2))]:
     vec = TfidfVectorizer(ngram_range=ng, max_features=30000, sublinear_tf=True)
@@ -63,7 +63,7 @@ for name, ng in [('TF-IDF(unigram)+LR', (1, 1)), ('TF-IDF(uni+bigram)+LR', (1, 2
 best_name, best_mf1, clf, pred, vec = best
 print(f"\n最佳配置：{best_name}")
 
-# ---------- 最佳配置的详细结果 ----------
+# 最佳配置的详细结果
 p, r, f, _ = precision_recall_fscore_support(y_test, pred, labels=LABELS, zero_division=0)
 per_class = {}
 for i, lab in enumerate(LABELS):
@@ -86,7 +86,7 @@ results['最佳模型'] = {
                'class_weight': 'balanced', 'max_iter': 2000, 'random_seed': RNG}
 }
 
-# ---------- 保存 ----------
+# 保存
 with open(BASE + 'results/baselineA_metrics.json', 'w', encoding='utf-8') as f:
     json.dump(results, f, ensure_ascii=False, indent=2)
 

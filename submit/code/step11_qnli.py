@@ -43,7 +43,7 @@ MAX_SEQ = 128            # QNLI 文本短，迁移时把最大长度从 512 降�
 LABELS = ['entailment', 'not_entailment']   # 0=含答案, 1=不含答案
 LE = {0: 'entailment', 1: 'not_entailment'}
 
-# ---- 1. 读 QNLI ----
+# 1. 读 QNLI
 ds = load_dataset('nyu-mll/glue', 'qnli')
 train = ds['train'].to_pandas()
 test = ds['validation'].to_pandas()   # 用官方验证集当测试（有标签）
@@ -68,7 +68,7 @@ print("训练标签分布:", pd.Series(y_tr).value_counts().to_dict())
 results = {}
 results['1_原方法基线'] = {'name': 'QEvasion E5-small+LR（原任务）', 'accuracy': 0.5682, 'macro_f1': 0.4715}
 
-# ---- 2. 迁移数据基线：TF-IDF + LR ----
+# 2. 迁移数据基线：TF-IDF + LR
 vec = TfidfVectorizer(ngram_range=(1, 1), max_features=30000, sublinear_tf=True)
 X_tr = vec.fit_transform(tr_texts)
 X_te = vec.transform(te_texts)
@@ -81,7 +81,7 @@ results['2_迁移数据基线'] = {
     'macro_f1': round(f1_score(y_te, pred, average='macro'), 4),
 }
 
-# ---- 3. 直接迁移：冻结 E5-small + LR ----
+# 3. 直接迁移：冻结 E5-small + LR
 model = SentenceTransformer(MODEL)
 print("直接迁移：编码 QNLI ...")
 emb_tr = model.encode(tr_texts, normalize_embeddings=True, show_progress_bar=True, batch_size=64)
@@ -95,7 +95,7 @@ results['3_直接迁移'] = {
     'macro_f1': round(f1_score(y_te, pred, average='macro'), 4),
 }
 
-# ---- 4. 适配后训练：对比微调 E5-small + LR ----
+# 4. 适配后训练：对比微调 E5-small + LR
 by_label = defaultdict(list)
 for i, lab in enumerate(y_tr):
     by_label[lab].append(i)
@@ -139,7 +139,7 @@ results['4_适配后训练'] = {
     'macro_f1': round(f1_score(y_te, pred, average='macro'), 4),
 }
 
-# ---- 落盘最佳模型（对比微调）的预测文件 ----
+# 落盘最佳模型（对比微调）的预测文件
 _cls = clf.classes_.tolist()
 _proba = clf.predict_proba(emb_te)
 qnli_df = pd.DataFrame({
@@ -163,7 +163,7 @@ results['配置'] = {
 with open(BASE + 'results/qnli_metrics.json', 'w', encoding='utf-8') as fh:
     json.dump(results, fh, ensure_ascii=False, indent=2)
 
-print("\n===== QNLI 迁移结果 =====")
+print("\nQNLI 迁移结果")
 for k in ['1_原方法基线', '2_迁移数据基线', '3_直接迁移', '4_适配后训练']:
     r = results[k]
     print(f"{r['name']:32s}  Acc={r['accuracy']}  Macro-F1={r['macro_f1']}")

@@ -48,7 +48,7 @@ test_texts = test.apply(text, axis=1).tolist()
 y_train = train['clarity_label'].tolist()
 y_test = test['clarity_label'].tolist()
 
-# ---- 冻结 E5-small 编码 ----
+# 冻结 E5-small 编码
 model = SentenceTransformer(MODEL)
 print("编码训练集 ...")
 emb_train = model.encode(train_texts, normalize_embeddings=True, show_progress_bar=True, batch_size=64)
@@ -59,7 +59,7 @@ np.save(BASE + 'results/e5small_emb_train.npy', emb_train)
 np.save(BASE + 'results/e5small_emb_test.npy', emb_test)
 print("已保存冻结句向量 .npy，维度", emb_train.shape)
 
-# ---- 类别平衡的标签编码 + 划分 ----
+# 类别平衡的标签编码 + 划分
 y_train_np = np.array(y_train)
 idx = np.arange(len(emb_train))
 tr_idx, val_idx = train_test_split(idx, test_size=0.1, stratify=y_train_np, random_state=RNG)

@@ -44,7 +44,7 @@ plt.rcParams['axes.unicode_minus'] = False
 BLUE, ORANGE = '#2a78d6', '#eb6834'
 SURFACE, INK, MUTED, GRID = '#ffffff', '#0b0b0b', '#898781', '#e1e0d9'
 
-# ---- 读 QNLI ----
+# 读 QNLI
 ds = load_dataset('nyu-mll/glue', 'qnli')
 train = ds['train'].to_pandas()
 test = ds['validation'].to_pandas()
@@ -116,7 +116,7 @@ out = {'任务': '数据效率扩展（QNLI）', '训练池': POOL, 'random_seed
 with open(BASE + 'results/data_efficiency.json', 'w', encoding='utf-8') as fh:
     json.dump(out, fh, ensure_ascii=False, indent=2)
 
-# ---- 学习曲线 ----
+# 学习曲线
 fig, ax = plt.subplots(figsize=(6.5, 4.2))
 ax.plot(SIZES, [r['TFIDF_Macro_F1'] for r in rows], 'o-', color=ORANGE, lw=2,
         label='TF-IDF + LR', markersize=7)

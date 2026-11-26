@@ -41,7 +41,7 @@ for key in sorted(groups, key=lambda k: -len(groups[k])):
 order = ['prob_Ambivalent', 'prob_Clear_Non-Reply', 'prob_Clear_Reply']
 for key in sorted(groups, key=lambda k: -len(groups[k])):
     items = groups[key]
-    lines.append(f'========== {key[0]} -> {key[1]}  ({len(items)} 条) ==========')
+    lines.append(f'{key[0]} -> {key[1]}  ({len(items)} 条)')
     for i, r in enumerate(items):
         q = r['question'].strip().replace('\n', ' ')
         a = r['interview_answer'].strip().replace('\n', ' ')

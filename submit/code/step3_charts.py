@@ -31,7 +31,7 @@ train['q_len'] = train['question'].str.split().str.len()
 order = ['Clear Reply', 'Ambivalent', 'Clear Non-Reply']
 colors = {'Clear Reply': BLUE, 'Ambivalent': ORANGE, 'Clear Non-Reply': AQUA}
 
-# ---------- 图1：标签分布 ----------
+# 图1：标签分布
 vc = train['clarity_label'].value_counts().reindex(order)
 fig, ax = plt.subplots(figsize=(6, 4.2))
 bars = ax.bar(order, vc.values, color=[colors[c] for c in order], width=0.55)
@@ -49,7 +49,7 @@ fig.tight_layout()
 fig.savefig(BASE + 'results/fig1_label_dist.png', dpi=150, facecolor=SURFACE)
 plt.close(fig)
 
-# ---------- 图2：长度分布（两栏） ----------
+# 图2：长度分布（两栏）
 fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(11, 4.2))
 
 # 左：回答长度直方图（截断到 99 分位，避免极长样本把图拉扁）

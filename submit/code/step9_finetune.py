@@ -49,7 +49,7 @@ test_texts = test.apply(text, axis=1).tolist()
 y_train = train['clarity_label'].tolist()
 y_test = test['clarity_label'].tolist()
 
-# ---- 1. 构造同标签正对 (anchor, positive) ----
+# 1. 构造同标签正对 (anchor, positive)
 by_label = defaultdict(list)
 for i, lab in enumerate(y_train):
     by_label[lab].append(i)
@@ -65,7 +65,7 @@ for i in range(len(train_texts)):
 train_dataset = Dataset.from_dict({'anchor': anchors, 'positive': positives})
 print(f"正对数量：{len(anchors)}，类别分布：", {k: len(v) for k, v in by_label.items()})
 
-# ---- 2. 加载模型并微调 ----
+# 2. 加载模型并微调
 model = SentenceTransformer(MODEL)
 model.max_seq_length = 512
 
@@ -96,7 +96,7 @@ trainer.train()
 model.save_pretrained(SAVE_DIR)
 print("已保存微调模型：", SAVE_DIR)
 
-# ---- 3. 用微调后模型重新编码 + 逻辑回归 ----
+# 3. 用微调后模型重新编码 + 逻辑回归
 print("微调后重新编码训练集 ...")
 emb_train = model.encode(train_texts, normalize_embeddings=True, show_progress_bar=True, batch_size=64)
 print("微调后重新编码测试集 ...")

@@ -42,7 +42,7 @@ def save_proba(out_df, path):
     print(f"  已保存 {path}（{len(out_df)} 行，含概率列 {PROB_COLS}）")
 
 
-# ---- baselineA：TF-IDF + LR ----
+# baselineA：TF-IDF + LR
 print("baselineA：TF-IDF + LR ...")
 vec = TfidfVectorizer(ngram_range=(1, 1), max_features=30000, sublinear_tf=True)
 X_tr = vec.fit_transform(train.apply(text, axis=1).tolist())
@@ -63,7 +63,7 @@ for k, c in enumerate(clf.classes_):
     dfA[f'prob_{c.replace(" ", "_")}'] = proba[:, k].round(4)
 save_proba(dfA, BASE + 'results/baselineA_predictions.csv')
 
-# ---- baselineB：复用冻结句向量 + LR ----
+# baselineB：复用冻结句向量 + LR
 print("baselineB：复用 e5small_emb_*.npy + LR ...")
 emb_tr = np.load(BASE + 'results/e5small_emb_train.npy')
 emb_te = np.load(BASE + 'results/e5small_emb_test.npy')
