@@ -59,14 +59,13 @@ python run_all.py --full
 | `step14_find_misclass.py` | 挑典型误判样本 | 误判候选 |
 | `step9_finetune.py` | 对比微调 E5-small（InfoNCE，慢） | `results/finetune_*.json` |
 | `step11_qnli.py` | QNLI 跨场景迁移（慢），并落盘微调模型预测 | `results/qnli_metrics.json`、`predictions/qnli_predictions.csv` |
-| `step13_data_efficiency.py` | 数据效率 10%/30%/100% | `results/data_efficiency.json` |
+| `step13_data_efficiency.py` | 数据效率 10%/30%/100%（训练池，5 次抽样） | `results/data_efficiency.json` |
+| `step13_full.py` | 数据效率补充：QNLI 全量训练集 | `results/qnli_full_metrics.json` |
 | `step16_ablation.py` | 指令前缀 [Q]/[A] 消融 | `results/ablation_*.json` |
 | `make_predictions.py` | 把预测文件转成提交格式（含 id） | `predictions/*.csv` |
 | `make_qnli_predictions.py` | 从已保存微调模型生成 QNLI 预测（跳过微调） | `predictions/qnli_predictions.csv` |
 
 > 注：`step12` 复用 `step10` 保存的句向量 `e5small_emb_*.npy`，因此 `step10` 必须先于 `step12` 运行。
-
-其余随附脚本：`step6_improve.py`（前缀消融早期版，与 `step16` 重复）、`step7_e5base.py`（E5-base 骨干）、`step8_concat.py`（TF-IDF 与句向量拼接）为改进探索；`step15_stats.py` 补表1的数据统计；`step_error_analysis.py` 输出误判样本分组统计（`results/error_candidates.txt`）。
 
 ## 五、预测文件格式
 
