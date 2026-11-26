@@ -81,55 +81,62 @@ else:
     np.save(pool_emb_path, pool_emb)
     np.save(test_emb_path, test_emb)
 
+SEEDS = [42, 123, 456, 789, 2024]
+
 rows = []
 for frac, size in zip(FRACTIONS, SIZES):
-    if size >= POOL:
-        sub_idx = np.arange(POOL)
-    else:
-        sub_idx, _ = train_test_split(np.arange(POOL), train_size=size,
-                                      stratify=np.array(pool_y), random_state=RNG)
-        sub_idx = np.sort(sub_idx)
-    sub_texts = [pool_texts[i] for i in sub_idx]
-    sub_y = [pool_y[i] for i in sub_idx]
+    tfidf_f1s, e5_f1s = [], []
+    for seed in SEEDS:
+        if size >= POOL:
+            sub_idx = np.arange(POOL)
+        else:
+            sub_idx, _ = train_test_split(np.arange(POOL), train_size=size,
+                                          stratify=np.array(pool_y), random_state=seed)
+            sub_idx = np.sort(sub_idx)
+        sub_texts = [pool_texts[i] for i in sub_idx]
+        sub_y = [pool_y[i] for i in sub_idx]
 
-    # TF-IDF + LR
-    vec = TfidfVectorizer(ngram_range=(1, 1), max_features=30000, sublinear_tf=True)
-    X = vec.fit_transform(sub_texts)
-    clf = LogisticRegression(max_iter=2000, class_weight='balanced', random_state=RNG)
-    clf.fit(X, sub_y)
-    tfidf_f1 = round(f1_score(te_y, clf.predict(vec.transform(te_texts)), average='macro'), 4)
+        # TF-IDF + LR
+        vec = TfidfVectorizer(ngram_range=(1, 1), max_features=30000, sublinear_tf=True)
+        X = vec.fit_transform(sub_texts)
+        clf = LogisticRegression(max_iter=2000, class_weight='balanced', random_state=RNG)
+        clf.fit(X, sub_y)
+        tfidf_f1s.append(f1_score(te_y, clf.predict(vec.transform(te_texts)), average='macro'))
 
-    # 冻结 E5 + LR（复用已编码的池向量，只切片）
-    X_emb = pool_emb[sub_idx]
-    clf = LogisticRegression(max_iter=2000, class_weight='balanced', random_state=RNG)
-    clf.fit(X_emb, sub_y)
-    e5_f1 = round(f1_score(te_y, clf.predict(test_emb), average='macro'), 4)
+        # 冻结 E5 + LR（复用已编码的池向量，只切片）
+        X_emb = pool_emb[sub_idx]
+        clf = LogisticRegression(max_iter=2000, class_weight='balanced', random_state=RNG)
+        clf.fit(X_emb, sub_y)
+        e5_f1s.append(f1_score(te_y, clf.predict(test_emb), average='macro'))
 
+    tf_m, tf_s = float(np.mean(tfidf_f1s)), float(np.std(tfidf_f1s))
+    e5_m, e5_s = float(np.mean(e5_f1s)), float(np.std(e5_f1s))
     rows.append({'比例': f'{int(frac*100)}%', '训练样本数': size,
-                 'TFIDF_Macro_F1': tfidf_f1, 'E5_Macro_F1': e5_f1})
-    print(f"{int(frac*100):3d}% ({size:5d} 条):  TF-IDF F1={tfidf_f1}   E5 F1={e5_f1}")
+                 'TFIDF_mean': round(tf_m, 4), 'TFIDF_std': round(tf_s, 4),
+                 'E5_mean': round(e5_m, 4), 'E5_std': round(e5_s, 4),
+                 'gap_mean': round(e5_m - tf_m, 4)})
+    print(f"{int(frac*100):3d}% ({size:5d} 条):  TF-IDF {tf_m:.4f}±{tf_s:.4f}   E5 {e5_m:.4f}±{e5_s:.4f}")
 
 df = pd.DataFrame(rows)
-out = {'任务': '数据效率扩展（QNLI）', '训练池': POOL, 'random_seed': RNG,
-       'rows': rows,
-       'gap': {r['比例']: round(r['E5_Macro_F1'] - r['TFIDF_Macro_F1'], 4) for r in rows}}
+out = {'任务': '数据效率扩展（QNLI，5 次抽样）', '训练池': POOL, '抽样种子': SEEDS,
+       'rows': rows}
 with open(BASE + 'results/data_efficiency.json', 'w', encoding='utf-8') as fh:
     json.dump(out, fh, ensure_ascii=False, indent=2)
 
 # 学习曲线
 fig, ax = plt.subplots(figsize=(6.5, 4.2))
-ax.plot(SIZES, [r['TFIDF_Macro_F1'] for r in rows], 'o-', color=ORANGE, lw=2,
-        label='TF-IDF + LR', markersize=7)
-ax.plot(SIZES, [r['E5_Macro_F1'] for r in rows], 's-', color=BLUE, lw=2,
-        label='冻结 E5-small + LR', markersize=7)
+ax.errorbar(SIZES, [r['TFIDF_mean'] for r in rows], yerr=[r['TFIDF_std'] for r in rows],
+            fmt='o-', color=ORANGE, lw=2, label='TF-IDF + LR', markersize=7, capsize=3)
+ax.errorbar(SIZES, [r['E5_mean'] for r in rows], yerr=[r['E5_std'] for r in rows],
+            fmt='s-', color=BLUE, lw=2, label='冻结 E5-small + LR', markersize=7, capsize=3)
 for x, r in zip(SIZES, rows):
-    ax.annotate(f"{r['TFIDF_Macro_F1']}", (x, r['TFIDF_Macro_F1']), textcoords='offset points',
-                xytext=(0, -16), ha='center', fontsize=9, color=MUTED)
-    ax.annotate(f"{r['E5_Macro_F1']}", (x, r['E5_Macro_F1']), textcoords='offset points',
-                xytext=(0, 9), ha='center', fontsize=9, color=INK)
+    ax.annotate(f"{r['TFIDF_mean']}", (x, r['TFIDF_mean']), textcoords='offset points',
+                xytext=(0, -18), ha='center', fontsize=9, color=MUTED)
+    ax.annotate(f"{r['E5_mean']}", (x, r['E5_mean']), textcoords='offset points',
+                xytext=(0, 11), ha='center', fontsize=9, color=INK)
 ax.set_xlabel('训练样本数（QNLI）', fontsize=11, color=MUTED)
 ax.set_ylabel('Macro-F1', fontsize=11, color=MUTED)
-ax.set_title('数据效率对比：预训练表示 vs 词袋', fontsize=13, color=INK, pad=12)
+ax.set_title('数据效率对比：预训练表示 vs 词袋（5 次抽样均值±标准差）', fontsize=13, color=INK, pad=12)
 ax.set_xscale('log')
 ax.set_xticks(SIZES)
 ax.set_xticklabels([str(s) for s in SIZES])
@@ -144,6 +151,6 @@ plt.close(fig)
 
 print("\n学习曲线已保存：results/fig_data_efficiency.png")
 print("结果已保存：results/data_efficiency.json")
-print("\n各比例下 E5 相对 TF-IDF 的领先幅度：")
+print("\n各比例下 E5 相对 TF-IDF 的领先幅度（均值）：")
 for r in rows:
-    print(f"  {r['比例']}: +{r['E5_Macro_F1'] - r['TFIDF_Macro_F1']:.4f}")
+    print(f"  {r['比例']}: +{r['gap_mean']:.4f}")
