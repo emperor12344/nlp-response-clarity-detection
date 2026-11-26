@@ -1,0 +1,15 @@
+# 大数据与模型缓存（不提交）
+data/
+models/
+*.npy
+
+# 系统临时文件
+desktop.ini
+~$*
+Thumbs.db
+
+# 开发辅助目录（非提交物）
+_extracted/
+outputs/
+paper/
+ppt/

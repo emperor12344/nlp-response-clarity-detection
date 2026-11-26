@@ -1,0 +1,30 @@
+{
+  "1_原方法基线": {
+    "name": "QEvasion E5-small+LR（原任务）",
+    "accuracy": 0.5682,
+    "macro_f1": 0.4715
+  },
+  "2_迁移数据基线": {
+    "name": "QNLI TF-IDF+LR",
+    "accuracy": 0.5777,
+    "macro_f1": 0.577
+  },
+  "3_直接迁移": {
+    "name": "QNLI 冻结 E5-small+LR",
+    "accuracy": 0.6767,
+    "macro_f1": 0.6767
+  },
+  "4_适配后训练": {
+    "name": "QNLI 对比微调 E5-small+LR",
+    "accuracy": 0.8305,
+    "macro_f1": 0.8305
+  },
+  "配置": {
+    "迁移数据": "QNLI (nyu-mll/glue)",
+    "训练抽样": 10000,
+    "测试": 5463,
+    "字段适配器": "text_a=question, text_b=sentence, label=0/1",
+    "max_seq_length": 128,
+    "random_seed": 42
+  }
+}

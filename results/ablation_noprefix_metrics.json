@@ -1,0 +1,56 @@
+{
+  "model": "intfloat/e5-small-v2",
+  "text_format": "plain \"question answer\" (no [Q]/[A] prefix)",
+  "accuracy": 0.5519,
+  "macro_precision": 0.4286,
+  "macro_recall": 0.4765,
+  "macro_f1": 0.4431,
+  "embedding_dim": 384,
+  "per_class": {
+    "Clear Reply": {
+      "precision": 0.2987,
+      "recall": 0.2911,
+      "f1": 0.2949
+    },
+    "Ambivalent": {
+      "precision": 0.712,
+      "recall": 0.6602,
+      "f1": 0.6851
+    },
+    "Clear Non-Reply": {
+      "precision": 0.275,
+      "recall": 0.4783,
+      "f1": 0.3492
+    }
+  },
+  "confusion_matrix": [
+    [
+      23,
+      49,
+      7
+    ],
+    [
+      48,
+      136,
+      22
+    ],
+    [
+      6,
+      6,
+      11
+    ]
+  ],
+  "labels": [
+    "Clear Reply",
+    "Ambivalent",
+    "Clear Non-Reply"
+  ],
+  "训练配置": {
+    "sentence_model": "intfloat/e5-small-v2",
+    "normalize": true,
+    "classifier": "LogisticRegression",
+    "class_weight": "balanced",
+    "max_iter": 2000,
+    "random_seed": 42
+  }
+}

@@ -1,0 +1,46 @@
+{
+  "说明": "统一字段适配器：把不同文本对任务统一成 text_a / text_b / label / group，训练、评估与可视化代码保持不变。",
+  "原任务": {
+    "name": "QEvasion",
+    "source": "huggingface.co/datasets/ailsntua/QEvasion",
+    "fields": {
+      "text_a": "question",
+      "text_b": "interview_answer",
+      "label": "clarity_label",
+      "group": "president"
+    },
+    "label_mapping": {
+      "Clear Reply": "明确提供所需信息",
+      "Ambivalent": "回答不完整或存在回避",
+      "Clear Non-Reply": "明确表示无法或不愿回答"
+    },
+    "样本构造": "\"[Q] {question} [A] {interview_answer}\"",
+    "任务类型": "三分类（文本对）"
+  },
+  "迁移任务": {
+    "name": "QNLI",
+    "source": "huggingface.co/datasets/nyu-mll/glue (config=qnli)",
+    "fields": {
+      "text_a": "question",
+      "text_b": "sentence",
+      "label": "label",
+      "group": null
+    },
+    "label_mapping": {
+      "0": "entailment（sentence 包含 question 的答案）",
+      "1": "not_entailment（sentence 不包含 question 的答案）"
+    },
+    "样本构造": "\"[Q] {question} [A] {sentence}\"",
+    "任务类型": "二分类（文本对）"
+  },
+  "复用部分": [
+    "文本对拼接编码接口（text_a + [SEP] + text_b）",
+    "TF-IDF / Sentence Transformer 编码",
+    "LogisticRegression(max_iter=2000, class_weight=balanced)",
+    "Macro-F1 主指标 + Accuracy / Per-class P/R/F1 + 混淆矩阵"
+  ],
+  "需修改部分": [
+    "label 映射（三分类 → 二分类）",
+    "最大序列长度（QEvasion 512 → QNLI 128）"
+  ]
+}

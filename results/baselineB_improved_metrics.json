@@ -1,0 +1,19 @@
+{
+  "model": "intfloat/e5-small-v2",
+  "variants": {
+    "A_无前缀(=基线B)": {
+      "accuracy": 0.5682,
+      "macro_f1": 0.4715
+    },
+    "B_query前缀": {
+      "accuracy": 0.5519,
+      "macro_f1": 0.4624
+    },
+    "C_任务指令前缀": {
+      "accuracy": 0.5065,
+      "macro_f1": 0.4162
+    }
+  },
+  "best": "A_无前缀(=基线B)",
+  "note": "A=无前缀即基线B(0.4715)；B/C为改进。主指标 Macro-F1。"
+}

@@ -1,0 +1,55 @@
+{
+  "model": "intfloat/e5-small-v2",
+  "accuracy": 0.5682,
+  "macro_precision": 0.4522,
+  "macro_recall": 0.5258,
+  "macro_f1": 0.4715,
+  "embedding_dim": 384,
+  "per_class": {
+    "Clear Reply": {
+      "precision": 0.3158,
+      "recall": 0.3038,
+      "f1": 0.3097
+    },
+    "Ambivalent": {
+      "precision": 0.7366,
+      "recall": 0.665,
+      "f1": 0.699
+    },
+    "Clear Non-Reply": {
+      "precision": 0.3043,
+      "recall": 0.6087,
+      "f1": 0.4058
+    }
+  },
+  "confusion_matrix": [
+    [
+      24,
+      46,
+      9
+    ],
+    [
+      46,
+      137,
+      23
+    ],
+    [
+      6,
+      3,
+      14
+    ]
+  ],
+  "labels": [
+    "Clear Reply",
+    "Ambivalent",
+    "Clear Non-Reply"
+  ],
+  "训练配置": {
+    "sentence_model": "intfloat/e5-small-v2",
+    "normalize": true,
+    "classifier": "LogisticRegression",
+    "class_weight": "balanced",
+    "max_iter": 2000,
+    "random_seed": 42
+  }
+}

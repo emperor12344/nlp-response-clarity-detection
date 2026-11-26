@@ -1,0 +1,71 @@
+{
+  "多数类基线": {
+    "accuracy": 0.6688,
+    "macro_f1": 0.2672,
+    "note": "全部预测为 Ambivalent"
+  },
+  "TF-IDF(unigram)+LR": {
+    "accuracy": 0.5195,
+    "macro_f1": 0.4147,
+    "n_features": 14024
+  },
+  "TF-IDF(uni+bigram)+LR": {
+    "accuracy": 0.4903,
+    "macro_f1": 0.3999,
+    "n_features": 30000
+  },
+  "最佳模型": {
+    "name": "TF-IDF(unigram)+LR",
+    "accuracy": 0.5195,
+    "macro_precision": 0.4032,
+    "macro_recall": 0.4423,
+    "macro_f1": 0.4147,
+    "per_class": {
+      "Clear Reply": {
+        "precision": 0.2414,
+        "recall": 0.2658,
+        "f1": 0.253
+      },
+      "Ambivalent": {
+        "precision": 0.7049,
+        "recall": 0.6262,
+        "f1": 0.6632
+      },
+      "Clear Non-Reply": {
+        "precision": 0.2632,
+        "recall": 0.4348,
+        "f1": 0.3279
+      }
+    },
+    "confusion_matrix": [
+      [
+        21,
+        48,
+        10
+      ],
+      [
+        59,
+        129,
+        18
+      ],
+      [
+        7,
+        6,
+        10
+      ]
+    ],
+    "labels": [
+      "Clear Reply",
+      "Ambivalent",
+      "Clear Non-Reply"
+    ],
+    "训练配置": {
+      "ngram": "1-1",
+      "max_features": 30000,
+      "sublinear_tf": true,
+      "class_weight": "balanced",
+      "max_iter": 2000,
+      "random_seed": 42
+    }
+  }
+}
